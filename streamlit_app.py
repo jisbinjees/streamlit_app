@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-#import polars as pl
+import polars as pl
 from ydata_profiling import ProfileReport
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
@@ -29,7 +29,6 @@ def set_background(image_url):
 set_background("https://i.redd.it/nflafw75q6a91.jpg")
 
 
-
 # Helper functions
 
 def load_csv(file, use_pandas=False):
@@ -41,7 +40,6 @@ def load_csv(file, use_pandas=False):
     except Exception:
         return pd.read_csv(file), "pandas"
 
-
 def impute_column(df, col, dtype):
     if np.issubdtype(dtype, np.integer):
         df[col] = df[col].fillna(int(df[col].mean() if df[col].mean() is not None else 0))
@@ -50,7 +48,6 @@ def impute_column(df, col, dtype):
     else:
         df[col] = df[col].fillna(df[col].mode()[0] if not df[col].mode().empty else "unknown")
     return df
-
 
 def clean_data(df, drop_na=False, dedup=False, normalize=False, impute=False):
     if drop_na:
@@ -65,14 +62,12 @@ def clean_data(df, drop_na=False, dedup=False, normalize=False, impute=False):
             df = impute_column(df, col, df[col].dtype)
     return df
 
-
 def make_profile(df):
     try:
         profile = ProfileReport(df, explorative=True)
         return profile.to_html()
     except Exception as e:
         return f"<h3>⚠ Profiling failed: {e}</h3>" + df.describe(include="all").transpose().to_html()
-
 
 def train_simple_model(df, target_col):
     df = df.dropna(subset=[target_col])
@@ -113,12 +108,12 @@ def train_simple_model(df, target_col):
     return model, task, score, encoders, target_encoder, list(X.columns)
 
 
-
 # Streamlit UI
 
 st.title("📊 Data-Cleansing, Profiling & ML Tool")
 st.write("Upload CSV → Clean → Profile → Train ML → Predict")
 
+# Upload CSV
 uploaded = st.file_uploader("Upload CSV", type=["csv"])
 if uploaded:
     df, kind = load_csv(uploaded, use_pandas=True)
@@ -127,6 +122,7 @@ if uploaded:
     st.write("### Data Preview")
     st.dataframe(df.head())
 
+    # Cleaning options
     st.write("### Cleaning Options")
     drop_na = st.checkbox("Drop missing values")
     dedup = st.checkbox("Remove duplicates")
@@ -138,10 +134,12 @@ if uploaded:
         st.dataframe(df_cleaned.head())
         st.session_state.cleaned_df = df_cleaned
 
+    # Profiling
     if st.button("Generate Profiling Report"):
         html_report = make_profile(df)
         st.components.v1.html(html_report, height=700, scrolling=True)
 
+    # Train model
     st.write("### Train Model")
     target_col = st.selectbox("Select target column", df.columns)
     if st.button("Train Model"):
@@ -150,8 +148,10 @@ if uploaded:
         st.session_state.encoders = encoders
         st.session_state.target_encoder = target_encoder
         st.session_state.feature_cols = feature_cols
+        st.session_state.task = task  
         st.success(f"Trained {task} model with score: {score:.3f}")
 
+    # Prediction
     if "model" in st.session_state:
         st.write("### Make Prediction")
         user_input = {}
@@ -165,6 +165,6 @@ if uploaded:
             for col, le in st.session_state.encoders.items():
                 input_df[col] = le.transform(input_df[col].astype(str))
             prediction = st.session_state.model.predict(input_df)[0]
-            if task == "classification" and st.session_state.target_encoder:
+            if st.session_state.task == "classification" and st.session_state.target_encoder:
                 prediction = st.session_state.target_encoder.inverse_transform([prediction])[0]
             st.success(f"Prediction: {prediction}")
