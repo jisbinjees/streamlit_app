@@ -1,9 +1,0 @@
-streamlit
-polars
-ydata_profiling
-pandas
-numpy
-altair
-scikit-learn
-Pillow
-
