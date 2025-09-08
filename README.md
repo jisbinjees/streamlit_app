@@ -16,5 +16,5 @@ A simple, interactive Streamlit app to **upload CSV files**, clean your data, ge
 - **Data Profiling**: Generate a **detailed profiling report** using `ydata-profiling`.  
 - **Machine Learning**: Train a simple Random Forest classifier or regressor.  
 - **Predictions**: Make predictions interactively for new data.  
-- **Dark Themed Background**: Makes it visually appealing and readable.  
+ 
 
