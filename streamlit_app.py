@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import polars as pl
+#import polars as pl
 from ydata_profiling import ProfileReport
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
