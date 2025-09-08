@@ -1,10 +1,9 @@
-streamlit==1.49.1
+streamlit
 polars
 ydata_profiling
 pandas
 numpy
 altair
 scikit-learn
-ydata-profiling
 Pillow
 
