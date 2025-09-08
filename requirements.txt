@@ -1,6 +1,6 @@
-streamlit
-polars
-ydata_profiling
+streamlit==1.49.1
+polars==1.33.0
+ydata-profiling==4.16.1
 pandas
 numpy
 altair
